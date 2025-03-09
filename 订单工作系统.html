@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清和拾六在线订单工作系统</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+       .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px; /* 限制最大宽度以适配不同设备 */
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #time {
+            font-size: 20px;
+            color: #e74c3c;
+            margin-bottom: 30px;
+        }
+
+       .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            min-width: 220px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #orderNumber {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* 登录页面样式 */
+        #login-container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #login-container h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #login-container input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        #login-container button {
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        #login-container button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 弹窗样式 */
+       .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0; /* 初始设置为透明 */
+            visibility: hidden; /* 初始隐藏 */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
+        }
+
+       .popup.show {
+            opacity: 1; /* 显示时设置为不透明 */
+            visibility: visible; /* 显示 */
+        }
+
+       .popup h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+       .popup button {
+            padding: 8px 20px;
+            background-color: #3498db; /* 设置为与主色调一致 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+       .popup button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-container">
+        <h2>登录</h2>
+        <input type="text" id="username" placeholder="请输入账号" />
+        <input type="password" id="password" placeholder="请输入密码" />
+        <button onclick="checkLogin()">登录</button>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
+        <h1>清和拾六在线订单工作系统</h1>
+        <div id="time"></div>
+
+        <div id="orderNumber"></div>
+
+        <div class="btn-group">
+            <button onclick="generateOrder()">订单号生成</button>
+            <button onclick="window.open('https://www.wjx.top/vm/t2FI5RH.aspx#')">人工线上开单</button>
+            <button onclick="window.open('https://www.wjx.cn/resultquery.aspx?activity=304199546')">订单查询</button>
+            <button onclick="window.open('https://www.wjx.top/vm/PKzPXiq.aspx#')">人工售后开单</button>
+            <button onclick="window.open('https://www.wjx.cn/resultquery.aspx?activity=304194923')">售后单查询</button>
+        </div>
+    </div>
+
+    <div class="popup" id="welcome-popup">
+        <h3>欢迎您，超级管理员！祝您工作愉快！</h3>
+        <button onclick="closePopup()">关闭</button>
+    </div>
+
+    <script>
+        // 实时更新时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\//g, '-');
+            document.getElementById('time').textContent = '北京时间：' + timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 生成唯一订单号
+        const generatedOrders = new Set();
+        function generateOrder() {
+            const timestamp = Date.now().toString().slice(-6);
+            const randomPart = Math.floor(Math.random() * 9000 + 1000);
+            let orderNumber = `QH${timestamp}${randomPart}`;
+
+            // 确保订单号唯一
+            while (generatedOrders.has(orderNumber)) {
+                randomPart = Math.floor(Math.random() * 9000 + 1000);
+                orderNumber = `QH${timestamp}${randomPart}`;
+            }
+            generatedOrders.add(orderNumber);
+
+            document.getElementById('orderNumber').innerHTML =
+                `生成的订单号：<span style="color:#e67e22;">${orderNumber}</span>`;
+        }
+
+        function checkLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'admin' && password === '060416') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                const popup = document.getElementById('welcome-popup');
+                popup.classList.add('show'); // 添加显示类名以触发过渡效果
+            } else {
+                alert('账号或密码错误，请重新输入');
+            }
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('welcome-popup');
+            popup.classList.remove('show'); // 移除显示类名以触发隐藏过渡效果
+        }
+    </script>
+</body>
+
+</html>
